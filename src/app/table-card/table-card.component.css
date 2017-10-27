@@ -1,0 +1,12 @@
+.mat-card {
+  padding: 0px;
+}
+
+.mat-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 18px;
+}
+
+

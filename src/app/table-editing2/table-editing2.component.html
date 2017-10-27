@@ -1,0 +1,62 @@
+<mat-card class="table-card-wrapper" (click)="expanded = undefined; $event.stopPropagation()">
+  <mat-card-title class="table-card-title">
+    <div> Supply </div>
+    <div>
+      <button mat-icon-button>
+        <mat-icon (click)="addRow()" color="primary"> add </mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon (click)="deleteRow()" color="primary"> delete </mat-icon>
+      </button>
+    </div>
+  </mat-card-title>
+
+  <mat-card-content>
+    <mat-table [dataSource]="dataSource">
+      <ng-container *ngFor="let column of displayedColumns; let j = index" matColumnDef={{column}}>
+        <mat-header-cell *matHeaderCellDef [ngSwitch]="types[column]" [ngStyle]="getCellStyle(column, -1)">
+          <mat-checkbox *ngSwitchCase="'checkbox'"> </mat-checkbox>
+          <ng-container *ngSwitchDefault> {{ column }} </ng-container>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element; let i = index" [ngSwitch]="types[column]" [ngStyle]="getCellStyle(column, i)">
+          <ng-container *ngSwitchCase="'text'">
+            <mat-card *ngIf="expanded == column + i; else notExpanded" (click)="$event.stopPropagation()">
+              <mat-form-field>
+                <input matInput class="input" [placeholder]="column" [(ngModel)]="data[i][column]">
+              </mat-form-field>
+            </mat-card>
+            <ng-template #notExpanded>
+              <a (click)="expanded = column + i; $event.stopPropagation()" class="editable-text" href="javascript:void(0)">
+                <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                  <mat-icon> edit </mat-icon>
+                </ng-container>
+                <ng-template #notEmpty>
+                  {{ element[column] }}
+                </ng-template>
+              </a>
+            </ng-template>
+          </ng-container>
+          <ng-container *ngSwitchCase="'checkbox'">
+            <mat-checkbox [(ngModel)]="data[i]['select']"> </mat-checkbox>
+          </ng-container>
+          <ng-container *ngSwitchCase="'table'">
+            <app-table-editing *ngIf="expanded == column + i; else notExpanded"></app-table-editing>
+            <ng-template #notExpanded>
+              <a (click)="expanded = column + i; $event.stopPropagation()" class="editable-text" href="javascript:void(0)">
+                <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                  <mat-icon> edit </mat-icon>
+                </ng-container>
+                <ng-template #notEmpty>
+                  {{ element[column] }}
+                </ng-template>
+              </a>
+            </ng-template>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </mat-card-content>
+</mat-card>

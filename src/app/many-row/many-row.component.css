@@ -1,0 +1,11 @@
+.mat-table {
+  /* width: 100%; */
+  /* overflow: auto; */
+}
+
+.mat-header-cell,
+.mat-cell {
+  white-space: nowrap;
+  padding-right: 30px;
+  /* margin-right: 30px; */
+}

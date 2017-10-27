@@ -1,0 +1,23 @@
+.mat-row {
+  /* padding: 0px; */
+}
+
+.mat-cell {
+  transition: all .7s ease-in-out;
+}
+
+.mat-card {
+  flex: 0 1 100%;
+  height: fit-content;
+}
+
+.mat-form-field {
+  width: 100%;
+  font-size: initial;
+  color: initial;
+  font-style: initial;
+}
+
+.table-inner {
+  flex: 0 1 100%;
+}

@@ -1,0 +1,34 @@
+<!-- <mat-table (click)="tableClicked($event); $event.stopPropagation()" #table [dataSource]="dataSource" class="mat-elevation-z8">
+  <ng-container *ngFor="let column of displayedColumns; let j = index" matColumnDef={{column}}>
+    <ng-container *matHeaderCellDef>
+      <mat-header-cell *ngIf="j == 0" [ngStyle]="hCellStyle['checkbox']">
+        <ng-container>
+          <mat-checkbox (change)="isChecked=!isChecked"> </mat-checkbox>
+        </ng-container>
+      </mat-header-cell>
+      <mat-header-cell>
+        <ng-container> {{ column }} </ng-container>
+      </mat-header-cell>
+    </ng-container>
+    <ng-container *matCellDef="let element; let i = index">
+      <mat-cell *ngIf="j === 0" [ngStyle]="cellStyle['checkbox']">
+        <mat-checkbox></mat-checkbox>
+      </mat-cell>
+      <mat-cell [ngStyle]="cellStyle[cellContent[i][column]]">
+        <a *ngIf="cellContent[i][column]=='text' || cellContent[i][column]==undefined" href="javascript:void(0)">
+          {{ element[column] }}
+        </a>
+        <mat-card *ngIf="cellContent[i][column] == 'input'" class="input-container mat-elevation-z8" (click)="$event.stopPropagation()">
+          <mat-form-field>
+            <input class='input' matInput [placeholder]="column" [value]="element[column]">
+          </mat-form-field>
+        </mat-card>
+        <app-table-cell-content *ngIf="cellContent[i][column] == 'table' && show" class="table-inner" [show]="!show">
+        </app-table-cell-content>
+      </mat-cell>
+    </ng-container>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table> -->

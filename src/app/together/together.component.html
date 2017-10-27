@@ -1,0 +1,91 @@
+<mat-card class="table-card-wrapper" (click)="clickAway($event)">
+  <mat-card-title class="table-card-title">
+    <div> Supply </div>
+    <div>
+      <button mat-icon-button>
+        <mat-icon (click)="addRow()" color="primary"> add </mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon (click)="deleteRow()" color="primary"> delete </mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon (click)="saveChanges()" color="primary"> save </mat-icon>
+      </button>
+    </div>
+  </mat-card-title>
+
+  <mat-card-content>
+    <mat-table [dataSource]="dataSource">
+      <ng-container *ngFor="let column of displayedColumns; let j = index" matColumnDef={{column}}>
+        <ng-container *matHeaderCellDef>
+          <mat-header-cell *ngIf="j == 0" [ngStyle]="getCellStyle('select', -1)">
+            <mat-checkbox> </mat-checkbox>
+          </mat-header-cell>
+          <mat-header-cell [ngSwitch]="types[column]" [ngStyle]="getCellStyle(column, -1)">
+            <mat-checkbox *ngSwitchCase="'checkbox'"> </mat-checkbox>
+            <ng-container *ngSwitchDefault> {{ column }} </ng-container>
+          </mat-header-cell>
+        </ng-container>
+
+        <ng-container *matCellDef="let element; let i = index">
+          <mat-cell *ngIf="j == 0" [ngStyle]="getCellStyle('select', i)">
+            <mat-checkbox (change)="selected($event, column, i)"></mat-checkbox>
+          </mat-cell>
+          <mat-cell [ngSwitch]="types[column]" [ngStyle]="getCellStyle(column, i)">
+            <ng-container *ngSwitchCase="'text'">
+              <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                  <input matInput class="input" [placeholder]="column" [(ngModel)]="data[i][column]">
+                </mat-form-field>
+              </mat-card>
+              <ng-template #notExpanded>
+                <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
+                  <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                    <mat-icon> edit </mat-icon>
+                  </ng-container>
+                  <ng-template #notEmpty>
+                    {{ element[column] }}
+                  </ng-template>
+                </a>
+              </ng-template>
+            </ng-container>
+            <ng-container *ngSwitchCase="'add'">
+              <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                  <span matPrefix>{{data[i][column].initial}}&nbsp;+&nbsp;</span>
+                  <input appAdd matInput [placeholder]="column" [(ngModel)]="data[i][column].added">
+                </mat-form-field>
+              </mat-card>
+              <ng-template #notExpanded>
+                <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
+                  <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                    <mat-icon> edit </mat-icon>
+                  </ng-container>
+                  <ng-template #notEmpty>
+                    {{ element[column].initial / 1 + element[column].added / 1 }}
+                  </ng-template>
+                </a>
+              </ng-template>
+            </ng-container>
+            <ng-container *ngSwitchCase="'checkbox'">
+              <mat-checkbox [(ngModel)]="data[i]['select']"> </mat-checkbox>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <app-together [initialData]="getDataAsPromise(column, i)" [types]="types[column]" *ngIf="isExpanded(column, i); else notExpanded"></app-together>
+              <ng-template #notExpanded>
+                <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
+                  <ng-container>
+                    <mat-icon> edit </mat-icon>
+                  </ng-container>
+                </a>
+              </ng-template>
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  </mat-card-content>
+</mat-card>

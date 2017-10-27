@@ -1,0 +1,39 @@
+.mat-table {
+  overflow: auto;
+  max-height: 500px;
+}
+
+.mat-column-checkbox {
+  display: flex;
+  flex: 0;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.mat-cell,
+.mat-header-cell {
+  align-self: flex-start;
+  padding-right: 24px;
+}
+
+no-margin {
+  align-self: baseline;
+}
+
+
+.mat-row:hover {
+  background-color: #EEEEEE;
+}
+
+.iicontainer {
+  display: flex;
+  position: absolute;
+  justify-content: space-around;
+  width: 100%;
+  background-color: #F6F6F6;
+}
+
+.icontainer {
+  width: 90%; 
+}

@@ -1,0 +1,27 @@
+.table-card-wrapper {
+  padding: 0px;
+}
+
+.table-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 18px;
+}
+
+.editable-text {
+  text-decoration: none;
+  color: black;
+}
+
+.mat-cell {
+  transition: all .7s ease-in-out;
+}
+
+.mat-form-field {
+  width: 100%;
+  font-size: initial;
+  color: initial;
+  font-style: initial;
+}
+
