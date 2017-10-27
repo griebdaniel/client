@@ -12,8 +12,8 @@ export class TableService {
 
 
   constructor(private http: Http) {
-    this.baseUrl = this.localUrl;
-    // this.baseUrl = this.serverUrl;
+    // this.baseUrl = this.localUrl;
+    this.baseUrl = this.serverUrl;
   }
 
   public modify(collection, modifications) {
@@ -110,7 +110,6 @@ export class TableService {
       };
 
       request(header, (err, res, body) => {
-
       });
     });
   }

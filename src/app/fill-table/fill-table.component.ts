@@ -22,7 +22,6 @@ export class FillTableComponent implements OnInit {
   }
 
   save(mods) {
-    console.log('save called');
     this.tableService.modify('supplies', mods);
   }
 }
