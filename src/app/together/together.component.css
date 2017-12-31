@@ -25,3 +25,18 @@
   font-style: initial;
 }
 
+.my-table {
+  position: absolute;
+  background-color: red;
+}
+
+.table-container {
+  background-color: red;
+  position: relative;
+}
+
+.save-button {
+  font-size: 20px;
+  font-weight: normal;
+}
+

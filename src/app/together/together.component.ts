@@ -2,10 +2,12 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { cloneDeep, clone } from 'lodash';
+import { cloneDeep, clone, get, keys, find, isEqual, difference, differenceWith, differenceBy } from 'lodash';
 import { ObjectId } from 'mongodb';
-import { eval } from 'mathjs';
 import { TableService } from '../dbservice/table.service';
+
+import { Subject } from 'rxjs/Subject';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-together',
@@ -16,74 +18,94 @@ export class TogetherComponent implements OnInit {
   modifications = { inserted: [], updated: [], deleted: [] };
 
   @Input() initialData: Promise<any>;
-  @Input() types: any;
-  @Output() saveMods = new EventEmitter<any>();
+  @Input() meta: any;
+  @Output() save = new EventEmitter<any>();
+
+  @Input() isRoot: boolean;
 
   data: any[];
-  unmodifedData: any[];
-
+  columns: any;
   expanded = { row: undefined, column: undefined };
-  beforeEdit: any;
+
   displayedColumns = [];
   dataChange = new BehaviorSubject<any[]>([]);
   dataSource;
 
-  mods = [];
-
-  modifiedDocs = [];
   selectedDocs = [];
+  acValues = new Subject<string[]>();
 
-  constructor(private tableService: TableService) {
-  }
+  originalData;
+
+  constructor(private tableService: TableService, public snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.initialData = Promise.resolve(this.initialData);
 
-    this.types.select = 'checkbox';
-    for (const key in this.types) {
-      if (this.types.hasOwnProperty(key) && key !== 'select') {
-        this.displayedColumns.push(key);
-      }
-    }
+    this.columns = this.meta.columns;
+
+    this.columns.forEach(column => {
+      this.displayedColumns.push(column.name);
+    });
 
     this.dataSource = new MyDataSource(this.dataChange);
     this.initialData.then(res => {
       this.data = res;
+      if (this.isRoot) {
+        this.originalData = cloneDeep(this.data);
+        this.convert(this.data, this.columns, true);
+      }
       this.dataChange.next(this.data);
     });
   }
 
-  getCellStyle(column, i): object {
-    switch (this.types[column]) {
-      case 'checkbox':
-        return { flexGrow: 0.17, flexShrink: 1 };
-      default:
-        if (this.isExpanded(column, i)) {
-          return { height: '0px', alignSelf: 'flex-start' };
+  convert(data: any, columns: any, dir?: boolean) {
+    dir = (dir === undefined) ? true : dir;
+
+    data.forEach(doc => {
+      const fields = keys(doc);
+      fields.forEach(field => {
+        const col = find(columns, { name: field });
+        if (col === undefined) {
+          return;
         }
-        break;
-    }
-    return {};
+        switch (col['type']) {
+          case 'addWithLimit':
+            if (dir) {
+              const limitField = col['limitField'];
+              console.log('converted to add with limit');
+              if (typeof doc[field] === 'number') {
+                doc[field] = { initial: doc[field], added: 0, limitField: doc[limitField] };
+              }
+            } else {
+              console.log('converted from add with limit');
+              doc[field] = doc[field].initial + doc[field].added;
+            }
+            break;
+          case 'table':
+            this.convert(doc[field], col['meta']['columns'], dir);
+            break;
+          default:
+            break;
+        }
+      });
+    });
   }
 
-  addToDelete(doc) {
-    const docToDelete = cloneDeep(doc);
+  getCellStyle(column, j, i): object {
+    if (column === 'select') {
+      return { flexGrow: 0.17, flexShrink: 1 };
+    }
 
-    this.displayedColumns.forEach(element => {
-      if (element === 'select' || docToDelete[element] === undefined) {
-        docToDelete[element] = { $exists: false };
-      }
-    });
+    if (this.isExpanded(column, i)) {
+      return { height: '0px', alignSelf: 'flex-start' };
+    }
 
-    this.mods.push({ action: 'delete', filter: docToDelete });
-
-    this.modifiedDocs.push({ action: 'delete', doc: docToDelete });
-
+    return {};
   }
 
   addRow() {
     const inserted = {};
-    this.data.unshift(inserted);
+    this.data.push(inserted);
     this.dataChange.next(this.data);
   }
 
@@ -94,56 +116,15 @@ export class TogetherComponent implements OnInit {
     this.dataChange.next(this.data);
   }
 
-  updateCell() {
-    if (this.expanded.row !== undefined && this.expanded.column !== undefined) {
-      const col = this.expanded.column;
-      const value = this.data[this.expanded.row][col];
-
-      this.displayedColumns.forEach(element => {
-        if (element === 'select' || this.beforeEdit[element] === undefined) {
-          this.beforeEdit[element] = { $exists: false };
-        }
-      });
-
-      const remove = ((o, key) => {
-        o.forEach(element => {
-          delete element[key];
-        });
-        for (const k in o) {
-          if (o.hasOwnProperty(k) && Array.isArray(o[k])) {
-            remove(o[k], key);
-          }
-        }
-      });
-
-      const valueSet = {};
-      valueSet[col] = cloneDeep(value);
-
-      if (Array.isArray(valueSet[col])) {
-        remove(valueSet[col], 'select');
-      }
-
-      this.mods.push({
-        action: 'update',
-        filter: this.beforeEdit,
-        valueSet: { $set: valueSet }
-      });
-    }
-  }
-
-  saveValue(column, i) { }
-
-  saveChanges() {
-    this.saveMods.emit();
-  }
-
   edit(event, column, row) {
     if (this.data[row][column] === undefined) {
-      this.data[row][column] = getDefaultValue(this.types[column]);
+      this.data[row][column] = this.getDefaultValue(column, row);
     }
+
     event.stopPropagation();
     this.setExpanded(column, row);
   }
+
 
   clickAway(event) {
     event.stopPropagation();
@@ -181,38 +162,64 @@ export class TogetherComponent implements OnInit {
     }
   }
 
-  convertData(data: any, dir?: boolean) {
-    data.forEach(doc => {
-      for (const key in doc) {
-        if (doc.hasOwnProperty(key)) {
-          switch (this.types[key]) {
-            case 'add':
-              if (dir) {
-                doc[key] = { initial: doc[key], added: 0 };
-              } else {
-                doc[key] = Number(doc[key].initial) + Number(doc[key].added);
-              }
-              break;
-            default:
-              break;
-          }
-        }
+  getDefaultValue(column, row) {
+    const col = find(this.columns, { name: column });
+
+    switch (col['type']) {
+      case 'addWithLimit':
+        return { initial: 0, added: 0, limitField: this.data[row][col['limitField']] };
+      default:
+        break;
+    }
+
+    return undefined;
+  }
+
+  keyup(event, j) {
+    this.acValues.next(this.meta.columns[j].acValues.filter(option => {
+      if (option === undefined) {
+        return false;
       }
+      return option.toLowerCase().indexOf(event.toLowerCase()) === 0;
+    }));
+  }
+
+  getAddWithColumn(element) {
+    return element.initial + element.added + '/' + element.limitField;
+  }
+
+
+  saveChanges() {
+    const modifications = this.getModifications();
+    const mods = { mods: modifications, comp: this };
+    this.save.emit(mods);
+  }
+
+  getModifications(): any {
+    const modifiedData = cloneDeep(this.data);
+    this.convert(modifiedData, this.columns, false);
+
+    const deleted = differenceBy(this.originalData, modifiedData, '_id');
+    const inserted = differenceBy(modifiedData, this.originalData, '_id');
+    let updated = differenceWith(modifiedData, this.originalData, isEqual);
+    updated = differenceWith(updated, inserted, isEqual);
+
+    return { inserted: inserted, deleted: deleted, updated: updated };
+  }
+
+  async savedSuccessfully(res: Promise<any>) {
+    res.then(response => {
+      this.data = response;
+      this.originalData = cloneDeep(this.data);
+      this.convert(this.data, this.columns, true);
+      this.dataChange.next(this.data);
+
+      this.snackBar.open('Saved successfully', '', {
+        duration: 2000,
+      });
     });
   }
 
-}
-
-export function getDefaultValue (type) {
-  switch (type) {
-    case 'add':
-      return { initial: 0, added: undefined };
-
-    default:
-      break;
-  }
-
-  return undefined;
 }
 
 export class MyDataSource extends DataSource<any> {

@@ -6,9 +6,9 @@ import { HttpModule } from '@angular/http';
 
 
 import {
-  MatButtonModule, MatCheckboxModule, MatMenuModule,
-  MatInputModule, MatTableModule, MatSelectModule,
-  MatCardModule, MatIconModule, MatListModule, MatExpansionModule,
+  MatButtonModule, MatCheckboxModule, MatMenuModule, MatTabsModule, MatAutocompleteModule,
+  MatInputModule, MatTableModule, MatSelectModule, MatToolbarModule, MatSnackBarModule,
+  MatCardModule, MatIconModule, MatListModule, MatExpansionModule, MatSidenavModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -27,7 +27,6 @@ import { TogetherComponent } from './together/together.component';
 
 import { TableService } from './dbservice/table.service';
 import { TogetherDirective } from './together/together.directive';
-import { AddDirective } from './together/add.directive';
 
 
 @NgModule({
@@ -35,13 +34,14 @@ import { AddDirective } from './together/add.directive';
     AppComponent, TableCellContentComponent, TableCardComponent, TableEditingComponent,
     TogetherComponent, FillTableComponent, TableEditing2Component,
     AutocompleteComponent, ManyRowComponent, DynamicWidthDirective, TogetherDirective,
-    MarginAlignDirective, AlignWidthDirective, AddDirective,
+    MarginAlignDirective, AlignWidthDirective,
   ],
   imports: [
-    BrowserModule, BrowserAnimationsModule, MatInputModule,
-    MatTableModule, MatCheckboxModule, MatCardModule, MatIconModule,
-    MatListModule, MatButtonModule, MatSelectModule,
-    MatExpansionModule, MatMenuModule, FormsModule, HttpModule,
+    BrowserModule, BrowserAnimationsModule, MatInputModule, MatToolbarModule,
+    MatTableModule, MatCheckboxModule, MatCardModule, MatSnackBarModule,
+    MatIconModule, MatAutocompleteModule, MatListModule, MatButtonModule,
+    MatSelectModule, MatSidenavModule, MatTabsModule,
+    MatExpansionModule, MatMenuModule, FormsModule, HttpModule
   ],
   providers: [TableService],
   bootstrap: [AppComponent]

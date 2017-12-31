@@ -10,13 +10,12 @@ export class TableService {
   serverUrl = 'http://35.193.213.249/api/';
   baseUrl;
 
-
   constructor(private http: Http) {
-    // this.baseUrl = this.localUrl;
-    this.baseUrl = this.serverUrl;
+    this.baseUrl = this.localUrl;
+    // this.baseUrl = this.serverUrl;
   }
 
-  public modify(collection, modifications) {
+  public async modify(collection, modifications): Promise<any> {
     const data = {
       collection: collection,
       modifications: modifications
@@ -28,12 +27,11 @@ export class TableService {
       json: data
     };
 
-    console.log(modifications);
-
     return new Promise((resolve, reject) => {
       request(header, (err, res, body) => {
-        console.log(body);
-        resolve(body);
+        this.find(collection, {}, {}).then(result => {
+          resolve(result);
+        });
       });
     });
   }
@@ -110,6 +108,24 @@ export class TableService {
       };
 
       request(header, (err, res, body) => {
+      });
+    });
+  }
+
+  public getNecessary(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const data = {
+
+      };
+
+      const header = {
+        url: this.baseUrl + 'getNecessary',
+        method: 'POST',
+        json: data
+      };
+
+      request(header, (err, res, body) => {
+        resolve(body);
       });
     });
   }

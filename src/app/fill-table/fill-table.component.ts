@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { TableService } from '../dbservice/table.service';
+import { get, set, keys } from 'lodash';
+
+import 'rxjs/add/operator/startWith';
+import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-fill-table',
@@ -7,21 +11,207 @@ import { TableService } from '../dbservice/table.service';
   styleUrls: ['./fill-table.component.css']
 })
 export class FillTableComponent implements OnInit {
+  @ViewChild('sidenav') sidenav;
+
   supplies: Promise<any>;
-  supps: Promise<any>;
-
-  suppliesTypes = { name: 'text', qty: 'add', attrs: { name: 'text', value: 'text' } };
-
   orders: Promise<any>;
-  ordersTypes = { name: 'text', supplies: { name: 'text', qtyNeeded: 'text', qtyArrived: 'text' } };
+  products: Promise<any>;
+  productOrders: Promise<any>;
+  necessary: Promise<any>;
+
+  selectedCollection = 'supplies';
+  selectedGroup = 'static';
+
+  acSupplies = [];
+  acProducts = [];
+
+  attrsMeta = {
+    collectionName: 'Attributes',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'value', type: 'text' },
+    ]
+  };
+
+  suppliesMeta = {
+    collectionName: 'Supplies',
+    columns: [
+      {
+        name: 'name', type: 'autocomplete', acValues: this.acSupplies
+      },
+      { name: 'qty', type: 'number' },
+      { name: 'attrs', type: 'table', meta: this.attrsMeta }
+    ]
+  };
+
+  orderListMeta = {
+    collectionName: 'Ordered Supplies',
+    columns: [
+      {
+        name: 'name', type: 'autocomplete', acValues: this.acSupplies
+      },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  oredersMeta = {
+    collectionName: 'Supply Orders',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'supplies', type: 'table', meta: this.orderListMeta },
+    ]
+  };
+
+  arrivedOrderListMeta = {
+    collectionName: 'Arrived Supplies',
+    columns: [
+      {
+        name: 'name', type: 'text', acValues: this.acSupplies
+      },
+      { name: 'arrived', type: 'addWithLimit', limitField: 'qty' }
+    ]
+  };
+
+  arrivedOredersMeta = {
+    collectionName: 'Orders Arrived',
+    columns: [
+      {
+        name: 'name', type: 'text', acValues: this.acSupplies
+      },
+      { name: 'supplies', type: 'table', meta: this.arrivedOrderListMeta },
+    ]
+  };
+
+  requirementsMeta = {
+    collectionName: 'Supply Requirements',
+    columns: [
+      { name: 'supply', type: 'text' },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  productsMeta = {
+    collectionName: 'Products',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'requirements', type: 'table', meta: this.requirementsMeta }
+    ]
+  };
+
+  productOrderListMeta = {
+    collectionName: 'Ordered Products',
+    columns: [
+      { name: 'product', type: 'text' },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  productOrdersMeta = {
+    collectionName: 'Product Order',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'products', type: 'table', meta: this.productOrderListMeta }
+    ]
+  };
+
+  finishedProductOrderListMeta = {
+    collectionName: 'Products Finished',
+    columns: [
+      { name: 'product', type: 'text' },
+      { name: 'finished', type: 'addWithLimit', limitField: 'qty' }
+    ]
+  };
+
+  finishedProductOrderMeta = {
+    collectionName: 'Finished Products',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'products', type: 'table', meta: this.finishedProductOrderListMeta }
+    ]
+  };
+
+  inventoryMeta = {
+    collectionName: 'Inventory',
+    columns: [
+      {
+        name: 'name', type: 'autocomplete', acValues: this.acSupplies
+      },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  necessarySupplyListMeta = {
+    collectionName: 'Supply List',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  necessaryMeta = {
+    collectionName: 'Necessary',
+    columns: [
+      { name: 'ordername', type: 'text' },
+      { name: 'required', type: 'table', meta: this.necessarySupplyListMeta },
+    ]
+  };
 
   constructor(private tableService: TableService) { }
 
   ngOnInit() {
     this.supplies = this.tableService.find('supplies', {}, {});
+    this.orders = this.tableService.find('orders', {}, {});
+    this.products = this.tableService.find('products', {}, {});
+    this.productOrders = this.tableService.find('productOrders', {}, {});
+
+    this.necessary = this.tableService.getNecessary();
+
+    this.supplies.then(supplies => {
+      supplies.forEach(supply => {
+        this.acSupplies.push(supply.name);
+      });
+    });
+
+    this.products.then(products => {
+      products.forEach(product => {
+        this.acProducts.push(product.name);
+      });
+    });
   }
 
-  save(mods) {
-    this.tableService.modify('supplies', mods);
+  save(modifications) {
+    const mods = modifications.mods;
+    const comp = modifications.comp;
+    const updated = this.tableService.modify(this.selectedCollection, mods);
+    comp.savedSuccessfully(updated);
   }
+
+  staticSelected() {
+    this.selectedGroup = 'static';
+    this.selectedCollection = 'supplies';
+    this.sidenav.close();
+  }
+
+  tabChange(event) {
+    switch (this.selectedGroup) {
+      case 'static':
+        switch (event.tab.textLabel) {
+          case 'Supplies':
+            this.selectedCollection = 'supplies';
+            break;
+          case 'Products':
+            this.selectedCollection = 'products';
+            break;
+        }
+        break;
+    }
+
+  }
+
+}
+
+export function replace(data, key, map) {
+  data.forEach(element => {
+    set(element, key, map.get(get(element, key)));
+  });
 }

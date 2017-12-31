@@ -1,2 +1,82 @@
-<app-together appMods (save)="save($event)" [initialData]="supplies" [types]="suppliesTypes">
-</app-together>
+<mat-toolbar>
+  <button type="button" mat-button (click)="sidenav.open()">
+    <mat-icon> toc </mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav class="example-sidenav">
+    <div class="sidenav-items">
+      <button mat-button (click)="selectedGroup = 'static'; selectedCollection = 'supplies'; sidenav.close()"> Static </button>
+      <button mat-button (click)="selectedGroup = 'supplyOrders'; selectedCollection = 'orders'; sidenav.close()"> SupplyOrder </button>
+      <button mat-button (click)="selectedGroup = 'productOrders'; selectedCollection = 'productOrders'; sidenav.close()"> ProductOrder </button>
+      <button mat-button (click)="selectedGroup = 'inventory'; selectedCollection = 'supplies'; sidenav.close()"> Inventory </button>
+      <button mat-button (click)="selectedGroup = 'necessary'; selectedCollection = 'necessary'; sidenav.close()"> Necessary </button>
+    </div>
+  </mat-sidenav>
+
+  <div class="example-sidenav-content">
+    <mat-tab-group (selectedTabChange)="tabChange($event, tab)" *ngIf="selectedGroup === 'static'" class="tabs">
+      <mat-tab label="Supplies">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="supplies" [meta]="suppliesMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+      <mat-tab label="Products">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="products" [meta]="productsMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <mat-tab-group *ngIf="selectedGroup === 'supplyOrders'" class="tabs">
+      <mat-tab label="New">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="orders" [meta]="oredersMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+      <mat-tab label="Arrived">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="orders" [meta]="arrivedOredersMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <mat-tab-group *ngIf="selectedGroup === 'productOrders'" class="tabs">
+      <mat-tab label="New">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="productOrders" [meta]="productOrdersMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+      <mat-tab label="Arrived">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="productOrders" [meta]="finishedProductOrderMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <mat-tab-group *ngIf="selectedGroup === 'inventory'" class="tabs">
+      <mat-tab label="Inventory">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="supplies" [meta]="inventoryMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <mat-tab-group *ngIf="selectedGroup === 'necessary'" class="tabs">
+      <mat-tab label="Necessary">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="necessary" [meta]="necessaryMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</mat-sidenav-container>
