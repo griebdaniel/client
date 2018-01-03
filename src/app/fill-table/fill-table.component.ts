@@ -24,6 +24,7 @@ export class FillTableComponent implements OnInit {
 
   acSupplies = [];
   acProducts = [];
+  suppliesMap = new Map<string, string>();
 
   attrsMeta = {
     collectionName: 'Attributes',
@@ -36,10 +37,7 @@ export class FillTableComponent implements OnInit {
   suppliesMeta = {
     collectionName: 'Supplies',
     columns: [
-      {
-        name: 'name', type: 'autocomplete', acValues: this.acSupplies
-      },
-      { name: 'qty', type: 'number' },
+      { name: 'name', type: 'text' },
       { name: 'attrs', type: 'table', meta: this.attrsMeta }
     ]
   };
@@ -85,7 +83,7 @@ export class FillTableComponent implements OnInit {
   requirementsMeta = {
     collectionName: 'Supply Requirements',
     columns: [
-      { name: 'supply', type: 'text' },
+      { name: 'supply', type: 'autocomplete', acValues: this.acSupplies },
       { name: 'qty', type: 'number' }
     ]
   };
@@ -101,7 +99,8 @@ export class FillTableComponent implements OnInit {
   productOrderListMeta = {
     collectionName: 'Ordered Products',
     columns: [
-      { name: 'product', type: 'text' },
+      // { name: 'product', type: 'text' },
+      { name: 'product', type: 'autocomplete', acValues: this.acProducts },
       { name: 'qty', type: 'number' }
     ]
   };
@@ -130,13 +129,23 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
+  // inventoryMeta = {
+  //   collectionName: 'Inventory',
+  //   columns: [
+  //     {
+  //       name: 'name', type: 'autocomplete', acValues: this.acSupplies
+  //     },
+  //     { name: 'qty', type: 'number' }
+  //   ]
+  // };
+
   inventoryMeta = {
     collectionName: 'Inventory',
     columns: [
       {
         name: 'name', type: 'autocomplete', acValues: this.acSupplies
       },
-      { name: 'qty', type: 'number' }
+      { name: 'qty', type: 'uom', uom: this.suppliesMap, refField: 'name' }
     ]
   };
 
@@ -169,6 +178,12 @@ export class FillTableComponent implements OnInit {
     this.supplies.then(supplies => {
       supplies.forEach(supply => {
         this.acSupplies.push(supply.name);
+        supply.attrs.forEach(elem => {
+          if (elem.name === 'uom') {
+            this.suppliesMap.set(supply.name, elem.value);
+          }
+        });
+
       });
     });
 
@@ -182,6 +197,7 @@ export class FillTableComponent implements OnInit {
   save(modifications) {
     const mods = modifications.mods;
     const comp = modifications.comp;
+    console.log(mods);
     const updated = this.tableService.modify(this.selectedCollection, mods);
     comp.savedSuccessfully(updated);
   }
@@ -211,7 +227,9 @@ export class FillTableComponent implements OnInit {
 }
 
 export function replace(data, key, map) {
+  console.log(data);
   data.forEach(element => {
     set(element, key, map.get(get(element, key)));
   });
+  console.log(data);
 }

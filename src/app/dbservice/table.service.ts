@@ -7,11 +7,11 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class TableService {
   localUrl = 'http://localhost:3000/';
-  serverUrl = 'http://35.193.213.249/api/';
+  serverUrl = 'http://mossrl.ro.lt/api/';
   baseUrl;
 
   constructor(private http: Http) {
-    this.baseUrl = this.localUrl;
+    // this.baseUrl = this.localUrl;
     // this.baseUrl = this.serverUrl;
   }
 

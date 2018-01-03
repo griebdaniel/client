@@ -49,6 +49,7 @@ export class TogetherComponent implements OnInit {
 
     this.dataSource = new MyDataSource(this.dataChange);
     this.initialData.then(res => {
+
       this.data = res;
       if (this.isRoot) {
         this.originalData = cloneDeep(this.data);
@@ -72,12 +73,10 @@ export class TogetherComponent implements OnInit {
           case 'addWithLimit':
             if (dir) {
               const limitField = col['limitField'];
-              console.log('converted to add with limit');
               if (typeof doc[field] === 'number') {
                 doc[field] = { initial: doc[field], added: 0, limitField: doc[limitField] };
               }
             } else {
-              console.log('converted from add with limit');
               doc[field] = doc[field].initial + doc[field].added;
             }
             break;
@@ -105,14 +104,19 @@ export class TogetherComponent implements OnInit {
 
   addRow() {
     const inserted = {};
-    this.data.push(inserted);
+    this.data.unshift(inserted);
+
     this.dataChange.next(this.data);
   }
 
   deleteRow() {
-    this.data = this.data.filter(item => this.selectedDocs.indexOf(item) < 0);
+    for (let i = 0; i < this.data.length; i++) {
+      if (this.selectedDocs.indexOf(this.data[i]) >= 0) {
+        this.data.splice(i, 1);
+        i--;
+      }
+    }
 
-    this.selectedDocs = [];
     this.dataChange.next(this.data);
   }
 
@@ -180,7 +184,11 @@ export class TogetherComponent implements OnInit {
       if (option === undefined) {
         return false;
       }
-      return option.toLowerCase().indexOf(event.toLowerCase()) === 0;
+      if (event) {
+        return option.toLowerCase().indexOf(event.toLowerCase()) === 0;
+      }
+
+      return true;
     }));
   }
 
@@ -191,6 +199,7 @@ export class TogetherComponent implements OnInit {
 
   saveChanges() {
     const modifications = this.getModifications();
+    console.log(modifications);
     const mods = { mods: modifications, comp: this };
     this.save.emit(mods);
   }
@@ -201,6 +210,8 @@ export class TogetherComponent implements OnInit {
 
     const deleted = differenceBy(this.originalData, modifiedData, '_id');
     const inserted = differenceBy(modifiedData, this.originalData, '_id');
+
+    console.log('original', this.originalData);
     let updated = differenceWith(modifiedData, this.originalData, isEqual);
     updated = differenceWith(updated, inserted, isEqual);
 

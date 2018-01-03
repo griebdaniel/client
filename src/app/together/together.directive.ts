@@ -17,7 +17,6 @@ export class TogetherDirective implements OnInit {
   }
 
   @HostListener('reload') onReload(data) {
-    console.log(data);
     this.initialData = cloneDeep(data);
     this.convert(data, this.comp.columns, true);
   }

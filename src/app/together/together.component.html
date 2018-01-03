@@ -48,6 +48,23 @@
                 </a>
               </ng-template>
             </ng-container>
+            <ng-container *ngSwitchCase="'uom'">
+              <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                  <input matInput class="input" [placeholder]="column" [(ngModel)]="data[i][column]">
+                </mat-form-field>
+              </mat-card>
+              <ng-template #notExpanded>
+                <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
+                  <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                    <mat-icon> edit </mat-icon>
+                  </ng-container>
+                  <ng-template #notEmpty>
+                    {{ element[column] + ' ' + columns[j]['uom'].get(element[columns[j]['refField']])  }}
+                  </ng-template>
+                </a>
+              </ng-template>  
+            </ng-container>
             <ng-container *ngSwitchCase="'number'">
               <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
                 <mat-form-field>
