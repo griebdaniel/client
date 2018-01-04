@@ -11,8 +11,8 @@ export class TableService {
   baseUrl;
 
   constructor(private http: Http) {
-    // this.baseUrl = this.localUrl;
-    this.baseUrl = this.serverUrl;
+    this.baseUrl = this.localUrl;
+    // this.baseUrl = this.serverUrl;
   }
 
   public async modify(collection, modifications): Promise<any> {

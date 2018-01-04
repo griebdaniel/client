@@ -43,17 +43,18 @@ export class FillTableComponent implements OnInit {
   };
 
   orderListMeta = {
-    collectionName: 'Ordered Supplies',
+    collectionName: 'Supplies',
     columns: [
       {
         name: 'name', type: 'autocomplete', acValues: this.acSupplies
       },
-      { name: 'qty', type: 'number' }
+      { name: 'qty', type: 'uom', uom: this.suppliesMap, refField: 'name' },
+      // { name: 'qty', type: 'number' }
     ]
   };
 
   oredersMeta = {
-    collectionName: 'Supply Orders',
+    collectionName: 'Ordered supplies',
     columns: [
       { name: 'name', type: 'text' },
       { name: 'supplies', type: 'table', meta: this.orderListMeta },
@@ -61,7 +62,7 @@ export class FillTableComponent implements OnInit {
   };
 
   arrivedOrderListMeta = {
-    collectionName: 'Arrived Supplies',
+    collectionName: 'Supplies',
     columns: [
       {
         name: 'name', type: 'text', acValues: this.acSupplies
@@ -71,7 +72,7 @@ export class FillTableComponent implements OnInit {
   };
 
   arrivedOredersMeta = {
-    collectionName: 'Orders Arrived',
+    collectionName: 'Arrived supplies',
     columns: [
       {
         name: 'name', type: 'text', acValues: this.acSupplies
@@ -80,10 +81,10 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
-  requirementsMeta = {
-    collectionName: 'Supply Requirements',
+  supplyNecessaryMeta = {
+    collectionName: 'Supply necessary',
     columns: [
-      { name: 'supply', type: 'autocomplete', acValues: this.acSupplies },
+      { name: 'name', type: 'autocomplete', acValues: this.acSupplies },
       { name: 'qty', type: 'number' }
     ]
   };
@@ -92,21 +93,20 @@ export class FillTableComponent implements OnInit {
     collectionName: 'Products',
     columns: [
       { name: 'name', type: 'text' },
-      { name: 'requirements', type: 'table', meta: this.requirementsMeta }
+      { name: 'necessary', type: 'table', meta: this.supplyNecessaryMeta }
     ]
   };
 
   productOrderListMeta = {
-    collectionName: 'Ordered Products',
+    collectionName: 'Products',
     columns: [
-      // { name: 'product', type: 'text' },
-      { name: 'product', type: 'autocomplete', acValues: this.acProducts },
+      { name: 'name', type: 'autocomplete', acValues: this.acProducts },
       { name: 'qty', type: 'number' }
     ]
   };
 
   productOrdersMeta = {
-    collectionName: 'Product Order',
+    collectionName: 'Ordered products',
     columns: [
       { name: 'name', type: 'text' },
       { name: 'products', type: 'table', meta: this.productOrderListMeta }
@@ -114,9 +114,9 @@ export class FillTableComponent implements OnInit {
   };
 
   finishedProductOrderListMeta = {
-    collectionName: 'Products Finished',
+    collectionName: 'Products',
     columns: [
-      { name: 'product', type: 'text' },
+      { name: 'name', type: 'text' },
       { name: 'finished', type: 'addWithLimit', limitField: 'qty' }
     ]
   };
@@ -129,16 +129,6 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
-  // inventoryMeta = {
-  //   collectionName: 'Inventory',
-  //   columns: [
-  //     {
-  //       name: 'name', type: 'autocomplete', acValues: this.acSupplies
-  //     },
-  //     { name: 'qty', type: 'number' }
-  //   ]
-  // };
-
   inventoryMeta = {
     collectionName: 'Inventory',
     columns: [
@@ -150,10 +140,10 @@ export class FillTableComponent implements OnInit {
   };
 
   necessarySupplyListMeta = {
-    collectionName: 'Supply List',
+    collectionName: 'Supplies',
     columns: [
       { name: 'name', type: 'text' },
-      { name: 'qty', type: 'number' }
+      { name: 'qty', type: 'uom', uom: this.suppliesMap, refField: 'name' }
     ]
   };
 
@@ -178,12 +168,13 @@ export class FillTableComponent implements OnInit {
     this.supplies.then(supplies => {
       supplies.forEach(supply => {
         this.acSupplies.push(supply.name);
-        supply.attrs.forEach(elem => {
-          if (elem.name === 'uom') {
-            this.suppliesMap.set(supply.name, elem.value);
-          }
-        });
-
+        if (supply.attrs !== undefined) {
+          supply.attrs.forEach(elem => {
+            if (elem.name === 'uom') {
+              this.suppliesMap.set(supply.name, elem.value);
+            }
+          });
+        }
       });
     });
 
