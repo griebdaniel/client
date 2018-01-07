@@ -8,7 +8,7 @@
   <mat-sidenav #sidenav class="example-sidenav">
     <div class="sidenav-items">
       <button mat-button (click)="selectedGroup = 'static'; selectedCollection = 'supplies'; sidenav.close()"> Static </button>
-      <button mat-button (click)="selectedGroup = 'supplyOrders'; selectedCollection = 'orders'; sidenav.close()"> SupplyOrder </button>
+      <button mat-button (click)="selectedGroup = 'supplyOrders'; selectedCollection = 'supplyOrders'; sidenav.close()"> SupplyOrder </button>
       <button mat-button (click)="selectedGroup = 'productOrders'; selectedCollection = 'productOrders'; sidenav.close()"> ProductOrder </button>
       <button mat-button (click)="selectedGroup = 'inventory'; selectedCollection = 'supplies'; sidenav.close()"> Inventory </button>
       <button mat-button (click)="selectedGroup = 'necessary'; selectedCollection = 'necessary'; sidenav.close()"> Necessary </button>
@@ -34,13 +34,13 @@
     <mat-tab-group *ngIf="selectedGroup === 'supplyOrders'" class="tabs">
       <mat-tab label="New">
         <div class="table-container">
-          <app-together [isRoot]=true (save)="save($event)" [initialData]="orders" [meta]="oredersMeta">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="supplyOrders" [meta]="oredersMeta">
           </app-together>
         </div>
       </mat-tab>
       <mat-tab label="Arrived">
         <div class="table-container">
-          <app-together [isRoot]=true (save)="save($event)" [initialData]="orders" [meta]="arrivedOredersMeta">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="supplyOrders" [meta]="arrivedOredersMeta">
           </app-together>
         </div>
       </mat-tab>
@@ -53,7 +53,7 @@
           </app-together>
         </div>
       </mat-tab>
-      <mat-tab label="Arrived">
+      <mat-tab label="Finished">
         <div class="table-container">
           <app-together [isRoot]=true (save)="save($event)" [initialData]="productOrders" [meta]="finishedProductOrderMeta">
           </app-together>

@@ -8,7 +8,8 @@ import { HttpModule } from '@angular/http';
 import {
   MatButtonModule, MatCheckboxModule, MatMenuModule, MatTabsModule, MatAutocompleteModule,
   MatInputModule, MatTableModule, MatSelectModule, MatToolbarModule, MatSnackBarModule,
-  MatCardModule, MatIconModule, MatListModule, MatExpansionModule, MatSidenavModule
+  MatCardModule, MatIconModule, MatListModule, MatExpansionModule, MatSidenavModule, MatPaginatorModule,
+  MatDatepickerModule, MatNativeDateModule,
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -27,6 +28,8 @@ import { TogetherComponent } from './together/together.component';
 
 import { TableService } from './dbservice/table.service';
 import { TogetherDirective } from './together/together.directive';
+import { AppRoutingModule } from './/app-routing.module';
+import { LoginComponent } from './login/login.component';
 
 
 @NgModule({
@@ -34,14 +37,15 @@ import { TogetherDirective } from './together/together.directive';
     AppComponent, TableCellContentComponent, TableCardComponent, TableEditingComponent,
     TogetherComponent, FillTableComponent, TableEditing2Component,
     AutocompleteComponent, ManyRowComponent, DynamicWidthDirective, TogetherDirective,
-    MarginAlignDirective, AlignWidthDirective,
+    MarginAlignDirective, AlignWidthDirective, LoginComponent,
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, MatInputModule, MatToolbarModule,
     MatTableModule, MatCheckboxModule, MatCardModule, MatSnackBarModule,
     MatIconModule, MatAutocompleteModule, MatListModule, MatButtonModule,
     MatSelectModule, MatSidenavModule, MatTabsModule,
-    MatExpansionModule, MatMenuModule, FormsModule, HttpModule
+    MatExpansionModule, MatMenuModule, FormsModule, HttpModule, MatPaginatorModule,
+    MatNativeDateModule, MatDatepickerModule, AppRoutingModule,
   ],
   providers: [TableService],
   bootstrap: [AppComponent]

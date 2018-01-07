@@ -11,8 +11,8 @@ export class TableService {
   baseUrl;
 
   constructor(private http: Http) {
-    this.baseUrl = this.localUrl;
-    // this.baseUrl = this.serverUrl;
+    // this.baseUrl = this.localUrl;
+    this.baseUrl = this.serverUrl;
   }
 
   public async modify(collection, modifications): Promise<any> {
@@ -45,6 +45,38 @@ export class TableService {
 
     const header = {
       url: this.baseUrl + 'find',
+      method: 'POST',
+      json: data
+    };
+
+    return new Promise((resolve, reject) => {
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public isLoggedIn(): Promise<any> {
+    const header = {
+      url: this.baseUrl + 'isLoggedIn',
+      method: 'POST',
+    };
+
+    return new Promise((resolve, reject) => {
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public login(username, password): Promise<any> {
+    const data = {
+      username: username,
+      password: password,
+    };
+
+    const header = {
+      url: this.baseUrl + 'login',
       method: 'POST',
       json: data
     };
@@ -123,6 +155,22 @@ export class TableService {
         method: 'POST',
         json: data
       };
+
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public getCounter() {
+    return new Promise((resolve, reject) => {
+
+      const header = {
+        url: this.baseUrl + '/',
+        method: 'GET',
+      };
+
+      console.log('getcounter called');
 
       request(header, (err, res, body) => {
         resolve(body);

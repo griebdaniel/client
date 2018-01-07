@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TableService } from '../dbservice/table.service';
 import { get, set, keys } from 'lodash';
+import { Router } from '@angular/router';
 
 import 'rxjs/add/operator/startWith';
 import { Subject } from 'rxjs/Subject';
@@ -14,7 +15,7 @@ export class FillTableComponent implements OnInit {
   @ViewChild('sidenav') sidenav;
 
   supplies: Promise<any>;
-  orders: Promise<any>;
+  supplyOrders: Promise<any>;
   products: Promise<any>;
   productOrders: Promise<any>;
   necessary: Promise<any>;
@@ -57,6 +58,7 @@ export class FillTableComponent implements OnInit {
     collectionName: 'Ordered supplies',
     columns: [
       { name: 'name', type: 'text' },
+      { name: 'arrivalDate', type: 'date' },
       { name: 'supplies', type: 'table', meta: this.orderListMeta },
     ]
   };
@@ -109,6 +111,7 @@ export class FillTableComponent implements OnInit {
     collectionName: 'Ordered products',
     columns: [
       { name: 'name', type: 'text' },
+      { name: 'deadline', type: 'date' },
       { name: 'products', type: 'table', meta: this.productOrderListMeta }
     ]
   };
@@ -155,11 +158,20 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
-  constructor(private tableService: TableService) { }
+  constructor(private router: Router, private tableService: TableService) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    // const res = await this.tableService.isLoggedIn();
+
+    // console.log(res);
+    // if (res === 'false') {
+    //   console.log('navigate to login');
+    //   this.router.navigate(['/login']);
+    //   return;
+    // }
+
     this.supplies = this.tableService.find('supplies', {}, {});
-    this.orders = this.tableService.find('orders', {}, {});
+    this.supplyOrders = this.tableService.find('supplyOrders', {}, {});
     this.products = this.tableService.find('products', {}, {});
     this.productOrders = this.tableService.find('productOrders', {}, {});
 
@@ -188,7 +200,7 @@ export class FillTableComponent implements OnInit {
   save(modifications) {
     const mods = modifications.mods;
     const comp = modifications.comp;
-    console.log(mods);
+
     const updated = this.tableService.modify(this.selectedCollection, mods);
     comp.savedSuccessfully(updated);
   }
@@ -218,9 +230,7 @@ export class FillTableComponent implements OnInit {
 }
 
 export function replace(data, key, map) {
-  console.log(data);
   data.forEach(element => {
     set(element, key, map.get(get(element, key)));
   });
-  console.log(data);
 }

@@ -8,7 +8,7 @@
       <button mat-icon-button>
         <mat-icon (click)="deleteRow()" color="primary"> delete </mat-icon>
       </button>
-      <button mat-icon-button>
+      <button mat-icon-button *ngIf="isRoot === true">
         <mat-icon (click)="saveChanges()" color="primary"> save </mat-icon>
       </button>
     </div>
@@ -48,10 +48,30 @@
                 </a>
               </ng-template>
             </ng-container>
+            <ng-container *ngSwitchCase="'date'">
+              <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="data[i][column]">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+              </mat-card>
+              <ng-template #notExpanded>
+                <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
+                  <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                    <mat-icon> edit </mat-icon>
+                  </ng-container>
+                  <ng-template #notEmpty>
+                    {{ element[column] | date: "dd/MM/yyyy" }}
+                  </ng-template>
+                </a>
+              </ng-template>
+            </ng-container>
             <ng-container *ngSwitchCase="'uom'">
               <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
                 <mat-form-field>
-                  <input matInput class="input" [placeholder]="column" [(ngModel)]="data[i][column]">
+                  <input matInput class="input" [placeholder]="column" [(ngModel)]="data[i][column]" type="number">
                 </mat-form-field>
               </mat-card>
               <ng-template #notExpanded>
@@ -60,10 +80,10 @@
                     <mat-icon> edit </mat-icon>
                   </ng-container>
                   <ng-template #notEmpty>
-                    {{ element[column] + ' ' + columns[j]['uom'].get(element[columns[j]['refField']])  }}
+                    {{ element[column] + ' ' + columns[j]['uom'].get(element[columns[j]['refField']]) }}
                   </ng-template>
                 </a>
-              </ng-template>  
+              </ng-template>
             </ng-container>
             <ng-container *ngSwitchCase="'number'">
               <mat-card *ngIf="isExpanded(column, i); else notExpanded" (click)="$event.stopPropagation()">
@@ -161,5 +181,8 @@
       <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
+    <!-- <mat-paginator class="paginator" *ngIf="isRoot === true" #paginator [length]="data.length" [pageIndex]="0" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator> -->
+
   </mat-card-content>
 </mat-card>

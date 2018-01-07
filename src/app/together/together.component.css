@@ -40,3 +40,8 @@
   font-weight: normal;
 }
 
+.paginator {
+  background-color: yellowgreen;
+  z-index: 100;
+}
+

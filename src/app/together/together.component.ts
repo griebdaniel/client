@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ViewChild } from '@angular/core';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -7,7 +7,8 @@ import { ObjectId } from 'mongodb';
 import { TableService } from '../dbservice/table.service';
 
 import { Subject } from 'rxjs/Subject';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatPaginator } from '@angular/material';
+
 
 @Component({
   selector: 'app-together',
@@ -23,7 +24,7 @@ export class TogetherComponent implements OnInit {
 
   @Input() isRoot: boolean;
 
-  data: any[];
+  data: any[] = [];
   columns: any;
   expanded = { row: undefined, column: undefined };
 
@@ -49,8 +50,7 @@ export class TogetherComponent implements OnInit {
 
     this.dataSource = new MyDataSource(this.dataChange);
     this.initialData.then(res => {
-
-      this.data = res;
+      this.data = res === undefined ? [] : res;
       if (this.isRoot) {
         this.originalData = cloneDeep(this.data);
         this.convert(this.data, this.columns, true);
@@ -129,7 +129,6 @@ export class TogetherComponent implements OnInit {
     this.setExpanded(column, row);
   }
 
-
   clickAway(event) {
     event.stopPropagation();
 
@@ -199,7 +198,6 @@ export class TogetherComponent implements OnInit {
 
   saveChanges() {
     const modifications = this.getModifications();
-    console.log(modifications);
     const mods = { mods: modifications, comp: this };
     this.save.emit(mods);
   }
