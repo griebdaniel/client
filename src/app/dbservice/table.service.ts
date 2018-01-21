@@ -24,7 +24,8 @@ export class TableService {
     const header = {
       url: this.baseUrl + 'modify',
       method: 'POST',
-      json: data
+      json: data,
+      withCredentials: true,
     };
 
     return new Promise((resolve, reject) => {
@@ -46,7 +47,8 @@ export class TableService {
     const header = {
       url: this.baseUrl + 'find',
       method: 'POST',
-      json: data
+      json: data,
+      withCredentials: true,
     };
 
     return new Promise((resolve, reject) => {
@@ -78,7 +80,26 @@ export class TableService {
     const header = {
       url: this.baseUrl + 'login',
       method: 'POST',
-      json: data
+      json: data,
+      withCredentials: true,
+    };
+
+    return new Promise((resolve, reject) => {
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public logout() {
+    const data = {
+    };
+
+    const header = {
+      url: this.baseUrl + 'logout',
+      method: 'POST',
+      json: data,
+      withCredentials: true,
     };
 
     return new Promise((resolve, reject) => {
@@ -153,7 +174,27 @@ export class TableService {
       const header = {
         url: this.baseUrl + 'getNecessary',
         method: 'POST',
-        json: data
+        json: data,
+        withCredentials: true,
+      };
+
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public getNecessaryAsCSV(selectedProductOrder: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const data = {
+        selectedProductOrder: selectedProductOrder,
+      };
+
+      const header = {
+        url: this.baseUrl + 'getNecessaryAsCSV',
+        method: 'POST',
+        json: data,
+        withCredentials: true,
       };
 
       request(header, (err, res, body) => {
@@ -169,8 +210,6 @@ export class TableService {
         url: this.baseUrl + '/',
         method: 'GET',
       };
-
-      console.log('getcounter called');
 
       request(header, (err, res, body) => {
         resolve(body);

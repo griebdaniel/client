@@ -46,12 +46,12 @@ export class TableCellContentComponent implements OnInit {
   ngOnInit(): void { }
 
   tableClicked() {
-    // if (this.cellStyle['table'].flexBasis === '80%') {
-    //   this.cellStyle['table'].flexBasis = '0%';
-    // } else {
-    //   this.cellStyle['table'].flexBasis = '80%';
-    //   this.cellStyle['table'].flexGrow = 1;
-    // }
+    if (this.cellStyle['table'].flexBasis === '80%') {
+      this.cellStyle['table'].flexBasis = '0%';
+    } else {
+      this.cellStyle['table'].flexBasis = '80%';
+      this.cellStyle['table'].flexGrow = 1;
+    }
   }
 }
 

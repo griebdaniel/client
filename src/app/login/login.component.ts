@@ -17,7 +17,8 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
-    const res = await this.tableService.getCounter();
+    const res = await this.tableService.login('test', 'test');
+
     console.log('result = ', res);
     // if (res === true) {
     //   this.router.navigate(['/home']);

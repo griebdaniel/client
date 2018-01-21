@@ -96,7 +96,7 @@ export class TogetherComponent implements OnInit {
     }
 
     if (this.isExpanded(column, i)) {
-      return { height: '0px', alignSelf: 'flex-start' };
+      return { height: '0px', alignSelf: 'flex-start', flexBasis: '0%' };
     }
 
     return {};

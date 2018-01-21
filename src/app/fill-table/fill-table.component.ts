@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 
 import 'rxjs/add/operator/startWith';
 import { Subject } from 'rxjs/Subject';
+import { MatDialog } from '@angular/material';
+import { DialogContentComponent } from './dialog-content.component';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-fill-table',
@@ -19,6 +23,10 @@ export class FillTableComponent implements OnInit {
   products: Promise<any>;
   productOrders: Promise<any>;
   necessary: Promise<any>;
+
+  selectedProductOrder = '';
+
+  user = { username: '', password: '' };
 
   selectedCollection = 'supplies';
   selectedGroup = 'static';
@@ -158,7 +166,7 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
-  constructor(private router: Router, private tableService: TableService) { }
+  constructor(private router: Router, private tableService: TableService, public dialog: MatDialog) { }
 
   async ngOnInit() {
     // const res = await this.tableService.isLoggedIn();
@@ -197,6 +205,20 @@ export class FillTableComponent implements OnInit {
     });
   }
 
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogContentComponent, {
+      data: this.user
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.tableService.login(this.user.username, this.user.password).then(res => console.log(res));
+    });
+  }
+
+  logout() {
+    this.tableService.logout().then(res => { console.log(res); });
+  }
+
   save(modifications) {
     const mods = modifications.mods;
     const comp = modifications.comp;
@@ -227,6 +249,11 @@ export class FillTableComponent implements OnInit {
 
   }
 
+  async getNecessaryAsCSV() {
+    const csv = await this.tableService.getNecessaryAsCSV(this.selectedProductOrder);
+    console.log('csv = ', csv);
+    saveAs(new Blob([csv]), 'necessary.csv');
+  }
 }
 
 export function replace(data, key, map) {
