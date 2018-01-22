@@ -23,6 +23,7 @@ export class FillTableComponent implements OnInit {
   products: Promise<any>;
   productOrders: Promise<any>;
   necessary: Promise<any>;
+  machines: Promise<any>;
 
   selectedProductOrder = '';
 
@@ -33,6 +34,11 @@ export class FillTableComponent implements OnInit {
 
   acSupplies = [];
   acProducts = [];
+  acMachines = [];
+  acProductOrders = [];
+
+  acValues = new Subject<string[]>();
+
   suppliesMap = new Map<string, string>();
 
   attrsMeta = {
@@ -99,11 +105,27 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
+  machinesMeta = {
+    collectionName: 'Machines',
+    columns: [
+      { name: 'name', type: 'text' }
+    ]
+  };
+
+  phasesMeta = {
+    collectionName: 'Phases',
+    columns: [
+      { name: 'machineName', type: 'autocomplete', acValues: this.acMachines },
+      { name: 'time', type: 'number' },
+    ]
+  };
+
   productsMeta = {
     collectionName: 'Products',
     columns: [
       { name: 'name', type: 'text' },
-      { name: 'necessary', type: 'table', meta: this.supplyNecessaryMeta }
+      { name: 'necessary', type: 'table', meta: this.supplyNecessaryMeta },
+      { name: 'phases', type: 'table', meta: this.phasesMeta }
     ]
   };
 
@@ -169,19 +191,11 @@ export class FillTableComponent implements OnInit {
   constructor(private router: Router, private tableService: TableService, public dialog: MatDialog) { }
 
   async ngOnInit() {
-    // const res = await this.tableService.isLoggedIn();
-
-    // console.log(res);
-    // if (res === 'false') {
-    //   console.log('navigate to login');
-    //   this.router.navigate(['/login']);
-    //   return;
-    // }
-
     this.supplies = this.tableService.find('supplies', {}, {});
     this.supplyOrders = this.tableService.find('supplyOrders', {}, {});
     this.products = this.tableService.find('products', {}, {});
     this.productOrders = this.tableService.find('productOrders', {}, {});
+    this.machines = this.tableService.find('machines', {}, {});
 
     this.necessary = this.tableService.getNecessary();
 
@@ -203,6 +217,18 @@ export class FillTableComponent implements OnInit {
         this.acProducts.push(product.name);
       });
     });
+
+    this.machines.then(machines => {
+      machines.forEach(element => {
+        this.acMachines.push(element.name);
+      });
+    });
+
+    this.productOrders.then(productOrders => {
+      productOrders.forEach(productOrder => {
+        this.acProductOrders.push(productOrder.name);
+      });
+    });
   }
 
   openDialog(): void {
@@ -220,6 +246,7 @@ export class FillTableComponent implements OnInit {
   }
 
   save(modifications) {
+    console.log(this.selectedCollection);
     const mods = modifications.mods;
     const comp = modifications.comp;
 
@@ -227,11 +254,11 @@ export class FillTableComponent implements OnInit {
     comp.savedSuccessfully(updated);
   }
 
-  staticSelected() {
-    this.selectedGroup = 'static';
-    this.selectedCollection = 'supplies';
-    this.sidenav.close();
-  }
+  // staticSelected() {
+  //   this.selectedGroup = 'static';
+  //   this.selectedCollection = 'supplies';
+  //   this.sidenav.close();
+  // }
 
   tabChange(event) {
     switch (this.selectedGroup) {
@@ -243,16 +270,26 @@ export class FillTableComponent implements OnInit {
           case 'Products':
             this.selectedCollection = 'products';
             break;
+          case 'Machines':
+            this.selectedCollection = 'machines';
         }
         break;
     }
-
   }
 
   async getNecessaryAsCSV() {
     const csv = await this.tableService.getNecessaryAsCSV(this.selectedProductOrder);
     console.log('csv = ', csv);
     saveAs(new Blob([csv]), 'necessary.csv');
+  }
+
+  keyup() {
+    this.acValues.next(this.acProductOrders.filter(option => {
+      if (option === undefined) {
+        return false;
+      }
+      return option.toLowerCase().indexOf(this.selectedProductOrder.toLowerCase()) === 0;
+    }));
   }
 }
 

@@ -33,6 +33,12 @@
           </app-together>
         </div>
       </mat-tab>
+      <mat-tab label="Machines">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="machines" [meta]="machinesMeta">
+          </app-together>
+        </div>
+      </mat-tab>
     </mat-tab-group>
 
     <mat-tab-group *ngIf="selectedGroup === 'supplyOrders'" class="tabs">
@@ -83,8 +89,13 @@
       </mat-tab>
       <mat-tab label="Save">
         <mat-form-field>
-            <input matInput type='text' [(ngModel)]="selectedProductOrder">
+            <input matInput type='text' [(ngModel)]="selectedProductOrder" (keyup)="keyup()" [placeholder]="ProductOrder" [matAutocomplete]="auto">
         </mat-form-field>
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of acValues | async" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-autocomplete>
         
         <button mat-button (click)="getNecessaryAsCSV()"> SaveInCSV </button>
       </mat-tab>
