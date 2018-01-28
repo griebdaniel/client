@@ -24,6 +24,8 @@ export class FillTableComponent implements OnInit {
   productOrders: Promise<any>;
   necessary: Promise<any>;
   machines: Promise<any>;
+  machineNecessary: Promise<any>;
+  price: Promise<any>;
 
   selectedProductOrder = '';
 
@@ -53,6 +55,7 @@ export class FillTableComponent implements OnInit {
     collectionName: 'Supplies',
     columns: [
       { name: 'name', type: 'text' },
+      { name: 'price', type: 'number' },
       { name: 'attrs', type: 'table', meta: this.attrsMeta }
     ]
   };
@@ -108,7 +111,8 @@ export class FillTableComponent implements OnInit {
   machinesMeta = {
     collectionName: 'Machines',
     columns: [
-      { name: 'name', type: 'text' }
+      { name: 'name', type: 'text' },
+      { name: 'price', type: 'number' }
     ]
   };
 
@@ -188,6 +192,32 @@ export class FillTableComponent implements OnInit {
     ]
   };
 
+  neccearyMachinesPhaseListMeta = {
+    collectionName: 'Machines',
+    columns: [
+      { name: 'name', type: 'text' },
+      { name: 'qty', type: 'number' }
+    ]
+  };
+
+  machineNecessaryMeta = {
+    collectionName: 'MachineNecessary',
+    columns: [
+      { name: 'ordername', type: 'text' },
+      { name: 'required', type: 'table', meta: this.neccearyMachinesPhaseListMeta }
+    ]
+  };
+
+  priceMeta = {
+    collectionName: 'Price',
+    columns: [
+      { name: 'ordername', type: 'text' },
+      { name: 'supplyPrice', type: 'number' },
+      { name: 'machinePrice', type: 'number' },
+      { name: 'total', type: 'number' },
+    ]
+  };
+
   constructor(private router: Router, private tableService: TableService, public dialog: MatDialog) { }
 
   async ngOnInit() {
@@ -198,6 +228,10 @@ export class FillTableComponent implements OnInit {
     this.machines = this.tableService.find('machines', {}, {});
 
     this.necessary = this.tableService.getNecessary();
+    this.machineNecessary = this.tableService.getMachineNecessary();
+    this.price = this.tableService.getPrice();
+
+    this.price.then(res => { console.log(res); });
 
     this.supplies.then(supplies => {
       supplies.forEach(supply => {

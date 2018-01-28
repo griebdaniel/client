@@ -31,8 +31,8 @@
 }
 
 .table-container {
-  height: 100vmax;
-  overflow: visible;
+  height: 500vmax;
+  overflow: auto;
 }
 
 .example-fill-remaining-space {

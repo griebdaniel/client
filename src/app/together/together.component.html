@@ -76,7 +76,7 @@
               </mat-card>
               <ng-template #notExpanded>
                 <a (click)="edit($event, column, i)" class="editable-text" href="javascript:void(0)">
-                  <ng-container *ngIf="element[column] == undefined || element[column] == ''; else notEmpty">
+                  <ng-container *ngIf="element[column] === undefined || element[column] === ''; else notEmpty">
                     <mat-icon> edit </mat-icon>
                   </ng-container>
                   <ng-template #notEmpty>

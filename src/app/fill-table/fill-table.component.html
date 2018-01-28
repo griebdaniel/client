@@ -81,9 +81,21 @@
     </mat-tab-group>
 
     <mat-tab-group *ngIf="selectedGroup === 'necessary'" class="tabs">
-      <mat-tab label="Necessary">
+      <mat-tab label="SupplyNecessary">
         <div class="table-container">
           <app-together [isRoot]=true (save)="save($event)" [initialData]="necessary" [meta]="necessaryMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+      <mat-tab label="MachineNecessary">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="machineNecessary" [meta]="machineNecessaryMeta">
+          </app-together>
+        </div>
+      </mat-tab>
+      <mat-tab label="Price">
+        <div class="table-container">
+          <app-together [isRoot]=true (save)="save($event)" [initialData]="price" [meta]="priceMeta">
           </app-together>
         </div>
       </mat-tab>
@@ -96,7 +108,6 @@
             {{ option }}
           </mat-option>
         </mat-autocomplete>
-        
         <button mat-button (click)="getNecessaryAsCSV()"> SaveInCSV </button>
       </mat-tab>
     </mat-tab-group>

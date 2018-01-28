@@ -184,6 +184,25 @@ export class TableService {
     });
   }
 
+  public getMachineNecessary(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const data = {
+
+      };
+
+      const header = {
+        url: this.baseUrl + 'getMachineNecessary',
+        method: 'POST',
+        json: data,
+        withCredentials: true,
+      };
+
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
   public getNecessaryAsCSV(selectedProductOrder: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const data = {
@@ -192,6 +211,24 @@ export class TableService {
 
       const header = {
         url: this.baseUrl + 'getNecessaryAsCSV',
+        method: 'POST',
+        json: data,
+        withCredentials: true,
+      };
+
+      request(header, (err, res, body) => {
+        resolve(body);
+      });
+    });
+  }
+
+  public getPrice(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const data = {
+      };
+
+      const header = {
+        url: this.baseUrl + 'getPrice',
         method: 'POST',
         json: data,
         withCredentials: true,
